@@ -2,6 +2,7 @@ package com.lwt.invoice
 
 import com.lwt.base.N4ViewLink
 import com.navis.argo.business.api.GroovyApi
+import com.navis.billing.business.model.Invoice
 import com.navis.billing.business.model.InvoiceItem
 import groovy.sql.Sql
 
@@ -17,7 +18,9 @@ class InvoiceUpdate {
 
     String invoiceID
     String sqlStr
-    ArrayList<InvoiceItem> invoiceItems
+
+    InvoiceItem invoiceItem
+    Invoice invoice
 
     //返回信息
     String retMsg
@@ -39,8 +42,11 @@ class InvoiceUpdate {
 select gkey from invoiceItem where 1=1
 """
         n4View.eachRow(sqlStr) { row ->
-            invoiceItems.push(InvoiceItem.findInvoiceItemGkeys(row["gkey"]))
+            invoiceItem = InvoiceItem.findInvoiceItemGkeys(row["gkey"])
+
         }
+
+        invoice = invoiceItem.getItemInvoice()
 
         //todo:更新InvoiceItem与Invoice实体相关字段
 
