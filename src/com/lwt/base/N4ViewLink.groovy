@@ -6,9 +6,13 @@ import groovy.sql.Sql
 /**
  * Created by badger on 2017/3/13.
  */
-class DbLink {
+class N4ViewLink {
     GroovyApi api = new GroovyApi();
     Sql sql;
+
+    N4ViewLink(){
+        initDataLink()
+    }
 
     void initDataLink() {
         try {
