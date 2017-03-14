@@ -52,7 +52,7 @@ select INVOICE_GKEY from V_BILL_INVOICE where BILLCODE='${billID}'
             updateInvoice(row)
         }
 
-
+        retMsg = "success"
         return retMsg
     }
 
