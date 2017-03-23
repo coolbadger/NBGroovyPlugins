@@ -1,6 +1,5 @@
 package com.lwt.invoice
 
-import com.lwt.base.OracleLink
 import com.navis.argo.business.api.GroovyApi
 import com.navis.billing.business.model.Invoice
 import com.navis.billing.business.model.InvoiceItem
@@ -28,7 +27,11 @@ class InvoiceUpdate {
     //入口
     public String execute(Map inParameters) {
         api = new GroovyApi()
-        n4View = new OracleLink("192.168.3.200", "orcl", "nbinvoice", "nbinvoice").sql
+        retMsg = "no item found!"
+        String orclClassName = "OracleLink"
+        def oracleInstance = api.getGroovyClassInstance(orclClassName)
+
+        n4View = oracleInstance.getLink("192.168.37.110", "nb", "nbinvoice", "nbinvoice")
 
         try {
             billID = inParameters.get("InvoiceID")
@@ -38,7 +41,7 @@ class InvoiceUpdate {
 
         //查询invoiceItem详情
         sqlStr = """
-select * from M_INVOICEDETAIL where BILLCODE='${billID}'
+select * from M_INVOICEDETAIL_VIEW where BILLCODE='${billID}'
 """
         n4View.eachRow(sqlStr) { row ->
             updateInvoiceItem(row)
@@ -46,10 +49,11 @@ select * from M_INVOICEDETAIL where BILLCODE='${billID}'
 
         //查询是否涉及到多票invoice
         sqlStr = """
-select INVOICE_GKEY from V_BILL_INVOICE where BILLCODE='${billID}'
+select INVOICE_GKEY from M_INVOICEDETAIL_VIEW where BILLCODE='${billID}'
 """
         n4View.eachRow(sqlStr) { row ->
             updateInvoice(row)
+            retMsg = "success"
         }
 
         retMsg = "success"
@@ -67,8 +71,11 @@ select INVOICE_GKEY from V_BILL_INVOICE where BILLCODE='${billID}'
         billList = invoice.getField("")
 
         if (!billList.contains(row["BILLCODE"])) {
-            billList += "," + row["BILLCODE"]
-            invoice.setFieldValue("", billList)
+            if (billList.length() > 1)
+                billList += ","
+            billList += row["BILLCODE"]
+            invoice.setFieldValue("invoiceFlexString01", billList) //发票号
+            invoice.setFieldValue("invoiceFlexString02", "0") //发票金额
         }
     }
 
@@ -77,7 +84,9 @@ select INVOICE_GKEY from V_BILL_INVOICE where BILLCODE='${billID}'
         invoiceItem = InvoiceItem.findInvoiceItemGkeys(row["ITEMNO"])
 
         //TODO: 直接将单号填入费收明细的自定义发票号字段、实际收费字段
-        invoiceItem.setFieldValue("", row["BILLCODE"])
+        invoiceItem.setFieldValue("invoiceParmBexuFlexString09", "ok")  //开票状态
+        invoiceItem.setFieldValue("invoiceParmBexuFlexString10", row["BILLCODE"])   //发票号
+//        invoiceItem.setFieldValue("invoiceParmBexuFlexDate05", row["BILLCODE"])   //开票日期
     }
 
 }

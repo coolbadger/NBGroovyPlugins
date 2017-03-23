@@ -16,12 +16,13 @@ class OracleLink {
     String userName
     String password
 
-    OracleLink(String host, String sid, String userName, String password) {
+    Sql getLink(String host, String sid, String userName, String password) {
         this.host = host
         this.sid = sid
         this.userName = userName
         this.password = password
         initDataLink()
+        return sql
     }
 
     void initDataLink() {
