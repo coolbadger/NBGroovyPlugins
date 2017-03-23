@@ -1,6 +1,7 @@
 package com.lwt.invoice
 
 import com.navis.argo.business.api.GroovyApi
+import com.navis.billing.BillingBizMetafield
 import com.navis.billing.business.model.Invoice
 import com.navis.billing.business.model.InvoiceItem
 import groovy.sql.Sql
@@ -85,6 +86,7 @@ select INVOICE_GKEY from M_INVOICEDETAIL_VIEW where BILLCODE='${billID}'
 
         //TODO: 直接将单号填入费收明细的自定义发票号字段、实际收费字段
         invoiceItem.setFieldValue("invoiceParmBexuFlexString09", "ok")  //开票状态
+        invoiceItem.setFieldValue(BillingBizMetafield.INVOICE_FLEX_STRING08,"OK")//具体哪个字段自己点出来
         invoiceItem.setFieldValue("invoiceParmBexuFlexString10", row["BILLCODE"])   //发票号
 //        invoiceItem.setFieldValue("invoiceParmBexuFlexDate05", row["BILLCODE"])   //开票日期
     }

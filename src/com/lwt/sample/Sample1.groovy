@@ -11,7 +11,7 @@ class Sample1 {
     public void test1(){
         String className = "Class2"
         //better use try-catch
-
+        
         //Way1:需要import Class2
         Class2 classInstance2 = (Class2)groovyApi.getGroovyClassInstance(className)
         String res2 = classInstance2.doTest("para1")
